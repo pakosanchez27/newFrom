@@ -16,6 +16,16 @@ $query = "SELECT * FROM datos WHERE id = {$id}";
 $resultados = mysqli_query($db, $query);
 $datos = mysqli_fetch_assoc($resultados);
 
+$nombre = $datos['nombre'];
+$apellido = $datos['apellido'];
+$carrera = $datos['carrera'];
+$email = $datos['email'];
+$genero = $datos['sexo'];
+$conocimiento = $datos['conocimiento'];
+$comentario = $datos['comentario'];
+$fecha = $datos['fecha'];
+$nombreImagen = $datos['foto'];
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre = mysqli_real_escape_string($db,  $_POST['nombre']);
@@ -27,49 +37,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $fecha = $_POST['fecha'];
     $comentario = mysqli_real_escape_string($db, $_POST['comentario']);
     $foto = $_FILES["foto"];
+
+
     // $temp = $_FILES["foto"]["tmp_name"];
     // move_uploaded_file($temp, "imagenes/$foto");
+
     $carpetaImagenes = 'imagenes/';
 
-   
     if (!is_dir($carpetaImagenes)) {
-            mkdir($carpetaImagenes);
-       }
+        mkdir($carpetaImagenes);
+    }
 
-     
     $nombreImagen = '';
 
     /** SUBIDA DE ARCHIVOS */
 
-    if($foto['name']) {
+    if ($foto['name']) {
         // Eliminar la imagen previa
 
         unlink($carpetaImagenes . $datos['foto']);
 
-        // // Generar un nombre único
-        $nombreImagen = md5( uniqid( rand(), true ) ) . ".jpg";
 
+        // Generar un nombre único
+        $nombreImagen = md5(uniqid(rand(), true)) . ".jpg";
         // // Subir la imagen
-        move_uploaded_file($foto['tmp_name'], $carpetaImagenes . $nombreImagen );
+        move_uploaded_file($foto['tmp_name'], $carpetaImagenes . $nombreImagen);
     } else {
         $nombreImagen = $datos['foto'];
     }
-    
-    // Insertar en la base de datos
+    // // Insertar en la base de datos
     $sql = "UPDATE datos SET nombre='$nombre', apellido='$apellido', email='$email', carrera='$carrera', sexo='$genero', conocimiento='$conocimiento', fecha='$fecha', comentario='$comentario', foto='$nombreImagen' WHERE id={$id}";
 
 
+  echo $sql;
 
-     echo $sql;
+    $resultado = mysqli_query($db, $sql);
 
+    if ($resultado) {
 
- $resultado = mysqli_query($db, $sql);
+      header('Location: /dashboard.php?resultado=2');
 
-    // if ($resultado) {
-
-    //   header('Location: dashboard.php?resultado=2');
-
-    // }
+    }
 
 }
 ?>
@@ -108,22 +116,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h2>Actualizar datos<span>.</span></h2>
                 </div>
                 <div class="contenedor__formulario">
-                    <form id="formulario"  method="post" class="formulario" enctype="multipart/form-data" action="/actualizar.php">
+                    <form id="formulario" method="post" class="formulario" enctype="multipart/form-data">
                         <div class="input nombre">
                             <label for="nombre">Nombre</label>
-                            <input type="text" name="nombre" id="nombre" placeholder="Tu nombre" require value="<?php echo $datos['nombre'] ?>">
+                            <input type="text" name="nombre" id="nombre" placeholder="Tu nombre" require value="<?php echo $nombre ?>">
                         </div>
                         <div class="input apellido">
                             <label for="apellido">Apellidos</label>
-                            <input type="text" name="apellido" id="apellido" placeholder="Tu apellido" value="<?php echo $datos['apellido'] ?>">
+                            <input type="text" name="apellido" id="apellido" placeholder="Tu apellido" value="<?php echo $apellido ?>">
                         </div>
                         <div class="input email">
                             <label for="email">Email</label>
-                            <input type="email" name="email" id="email" placeholder="Tu correo electronico" value="<?php echo $datos['email'] ?>">
+                            <input type="email" name="email" id="email" placeholder="Tu correo electronico" value="<?php echo $email ?>">
                         </div>
                         <div class="input fecha">
                             <label for="fecha">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha" id="fecha" value="<?php echo $datos['fecha'] ?>">
+                            <input type="date" name="fecha" id="fecha" value="<?php echo $fecha ?>">
                         </div>
                         <div class="input sexo">
                             <div class="campo">
@@ -235,7 +243,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                         <div class="input comentario">
                             <label for="comentario">Sobre Mi</label>
-                            <textarea name="comentario" id="comentario" cols="30" rows="5" placeholder="Escribe algo sobre ti"><?php echo $datos['comentario'] ?></textarea>
+                            <textarea name="comentario" id="comentario" cols="30" rows="5" placeholder="Escribe algo sobre ti"><?php echo $comentario ?></textarea>
                         </div>
                         <div class="botones">
                             <div class="input foto">
